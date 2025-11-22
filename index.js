@@ -1,18 +1,23 @@
 const express = require("express");
 const app = express();
 
-app.post("/signup", (req, res) => {
-  res.send("created user successfully");
+app.post("/user/signup", function (req, res) {
+  res.json("created user successfully");
 });
 
-app.post("/signin", (req, res) => {
-  res.send("you are signed in");
+app.post("/user/signin", function (req, res) {
+  res.json("you are signed in");
 });
 
-app.post("/purchase", (req, res) => {
-  res.send("buy a course");
+app.get("/user/courses", function (req, res) {
+  res.json("purchased courses");
 });
 
-app.post("/course", (req, res) => {
-  res.send("purchased courses");
+app.post("/user/purchase", function (req, res) {
+  res.json("buy a course here");
 });
+
+app.get("/user/purchases", function (req, res) {
+  res.json("courses that u have bought");
+});
+app.listen(3000);
