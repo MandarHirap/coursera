@@ -16,5 +16,10 @@
     "url": "https://github.com/MandarHirap/coursera/issues"
   },
   "homepage": "https://github.com/MandarHirap/coursera#readme",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^9.0.0"
+  }
 }
