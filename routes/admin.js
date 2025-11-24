@@ -9,15 +9,15 @@ adminRouter.post("/signin", function (req, res) {
   res.json("you are signed in");
 });
 
-adminRouter.post("/course", function (req, res) {
+adminRouter.post("/", function (req, res) {
   res.json("you are signed in");
 });
 
-adminRouter.put("/course", function (req, res) {
+adminRouter.put("/", function (req, res) {
   res.json("you are signed in");
 });
 
-adminRouter.get("/course/bulk", function (req, res) {
+adminRouter.get("/bulk", function (req, res) {
   res.json("you are signed in");
 });
 
