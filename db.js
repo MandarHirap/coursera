@@ -1,10 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const objectId = mongoose.Types.ObjectId;
-console.log("connected to");
-mongoose.connect(
-  "mongodb+srv://admin:Mandar%402020@cluster0.apqxkyx.mongodb.net/course-selling"
-);
 
 const UserSchema = new Schema({
   email: { type: String, unique: true },
@@ -23,11 +19,11 @@ const CourseSchema = new Schema({
   description: String,
   price: Number,
   imageUrl: String,
-  creatorId: objectId,
+  creatorId: { type: Schema.Types.ObjectId, ref: "admin" },
 });
 const PurchaseSchema = new Schema({
-  userId: objectId,
-  courseId: objectId,
+  courseId: { type: Schema.Types.ObjectId, ref: "course" },
+  userId: { type: Schema.Types.ObjectId, ref: "user" },
 });
 
 const UserModel = mongoose.model("user", UserSchema);
