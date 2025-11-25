@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { z } = require("zod");
 
-jwt_secret = "coursera";
+const jwt_secret = "coursera";
 const salt_rounds = 10;
 
 const signupSchema = z.object({
@@ -29,49 +29,66 @@ userRouter.post("/signup", async function (req, res) {
         errors: parsed.error.errors,
       });
     }
-    const { email, password } = parsed.data;
+
+    const { email, password, firstname, lastname } = parsed.data;
+
     const existingUser = await UserModel.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "user already exists" });
     }
 
-    const hashedpassword = awaitbcrypt.hash(password, salt_rounds);
+    const hashedpassword = await bcrypt.hash(password, salt_rounds);
 
     await UserModel.create({
       email,
       password: hashedpassword,
+      firstname,
+      lastname,
     });
-    returnres.json({ message: "User created successfully" });
+
+    return res.json({ message: "User created successfully" });
   } catch (error) {
     return res.status(500).json({ message: "internal server error" });
   }
 });
 
 userRouter.post("/signin", async function (req, res) {
-  const parsed = signinSchema.safeParse(req.body);
-  if (!parsed.success) {
-    return res.status(400).json({
-      message: parsed.error.errors,
-    });
+  try {
+    const parsed = signinSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({
+        message: "validation failed",
+        errors: parsed.error.errors,
+      });
+    }
 
     const { email, password } = parsed.data;
 
-    const usre = await UserModel.findOne({ email });
-
+    const user = await UserModel.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "user not found" });
     }
-    const isvalid = await bcrypt.compare(password, hashedpassword);
-    if (!isvalid) {
+
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) {
       return res.status(401).json({ message: "wrong password" });
     }
+
+    const token = jwt.sign({ id: user._id }, jwt_secret);
+
+    return res.json({
+      message: "signin success",
+      token: token,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "internal server error" });
   }
 });
 
 userRouter.get("/purchase", function (req, res) {
-  res.json("courses that u have bought");
+  res.json("courses that you have bought");
 });
 
 module.exports = {
-  userRouter: userRouter,
+  userRouter,
 };
