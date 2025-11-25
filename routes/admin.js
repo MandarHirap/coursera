@@ -3,7 +3,7 @@ const adminRouter = Router();
 const { adminModel } = require("../db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { z } = require("zod");
+const { z, parse } = require("zod");
 const jwt_secret = "coursera";
 const salt_rounds = 10;
 
@@ -47,32 +47,38 @@ adminRouter.post("/signup", async function (req, res) {
 
 adminRouter.post("/signin", async function (req, res) {
   try {
-    const { email, password } = req.body;
-    const admin = await adminModel.findOne({ email });
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Email and password are required" });
+    const parsed = signinSchema(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({
+        message: "Validation failed",
+        errors: parsed.error.errors,
+      });
     }
+    const { email, password } = parsed.data;
 
+    const admin = await adminModel.findOne({ email });
     if (!admin) {
       return res.status(400).json({ message: "Admin not found" });
     }
-    const ispasswordvalid = await bcrypt.compare(password, admin.password);
-    if (!ispasswordvalid) {
-      return res.status(401).json({ message: "Incorrect password " });
+
+    const isvalid = await bcrypt.compare(password, hashedpassword);
+    if (!isvalid) {
+      return res.status(401).json({ message: "wrong password" });
     }
+
     const token = jwt.sign(
       {
         id: admin._id,
         email: admin.email,
       },
       jwt_secret,
-      { expiresIn: "1h" }
+      {
+        expiresIn: "1h",
+      }
     );
-    return res.json({ message: "signed in", token });
+    return res.json({ message: "sign in ", token });
   } catch (err) {
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "internal server error" });
   }
 });
 
