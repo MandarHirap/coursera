@@ -3,18 +3,31 @@ const adminRouter = Router();
 const { adminModel } = require("../db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-
+const { z } = require("zod");
 const jwt_secret = "coursera";
 const salt_rounds = 10;
 
+const signupSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6),
+});
+
+const signinSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6),
+});
+
 adminRouter.post("/signup", async function (req, res) {
   try {
-    const { email, password } = req.body;
-    if (!email || !password) {
+    const parsed = signupSchema.safeParse(req.body);
+    if (!parsed.success) {
       return res
         .status(400)
-        .json({ message: "Email and password is required" });
+        .json({ message: "Validation failed", errors: parsed.error.errors });
     }
+
+    const { email, password } = parsed.data;
+
     const exisitingAdmin = await adminModel.findOne({ email });
     if (exisitingAdmin) {
       return res.status(400).json({ message: "Admin already exists" });
@@ -25,7 +38,7 @@ adminRouter.post("/signup", async function (req, res) {
       email,
       password: hashedpassword,
     });
-    // return res.json({"admin created successfully"});
+
     return res.json({ message: "Admin created successfully" });
   } catch (err) {
     return res.status(500).json({ error: "Internal server error" });
