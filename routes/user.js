@@ -5,14 +5,14 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { z } = require("zod");
 
-const jwt_secret = "coursera";
+const { user_jwt_secret } = require("../config");
 const salt_rounds = 10;
 
 const signupSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
-  firstname: z.string().max(50),
-  lastname: z.string().max(50),
+  firstName: z.string().max(50),
+  lastName: z.string().max(50),
 });
 
 const signinSchema = z.object({
@@ -30,7 +30,7 @@ userRouter.post("/signup", async function (req, res) {
       });
     }
 
-    const { email, password, firstname, lastname } = parsed.data;
+    const { email, password, firstName, lastName } = parsed.data;
 
     const existingUser = await UserModel.findOne({ email });
     if (existingUser) {
@@ -42,8 +42,8 @@ userRouter.post("/signup", async function (req, res) {
     await UserModel.create({
       email,
       password: hashedpassword,
-      firstname,
-      lastname,
+      firstName,
+      lastName,
     });
 
     return res.json({ message: "User created successfully" });

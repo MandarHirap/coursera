@@ -4,7 +4,8 @@ const { adminModel } = require("../db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { z, parse } = require("zod");
-const jwt_secret = "coursera";
+const { admin_jwt_secret } = require("../config");
+const { adminmiddleware } = require("../middleware/admin");
 const salt_rounds = 10;
 
 const signupSchema = z.object({
@@ -82,8 +83,8 @@ adminRouter.post("/signin", async function (req, res) {
   }
 });
 
-adminRouter.post("/course", function (req, res) {
-  res.json("you are signed in");
+adminRouter.post("/course", adminmiddleware, function (req, res) {
+  const adminId = req.userId;
 });
 
 adminRouter.put("/course", function (req, res) {
