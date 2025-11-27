@@ -1,11 +1,12 @@
 const { Router } = require("express");
 const adminRouter = Router();
-const { adminModel } = require("../db");
+const { adminModel, CourseModel } = require("../db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { z, parse } = require("zod");
 const { admin_jwt_secret } = require("../config");
 const { adminmiddleware } = require("../middleware/admin");
+const admin = require("../middleware/admin");
 const salt_rounds = 10;
 
 const signupSchema = z.object({
@@ -48,7 +49,7 @@ adminRouter.post("/signup", async function (req, res) {
 
 adminRouter.post("/signin", async function (req, res) {
   try {
-    const parsed = signinSchema(req.body);
+    const parsed = signinSchema.safeParse(req.body);
     if (!parsed.success) {
       return res.status(400).json({
         message: "Validation failed",
@@ -62,7 +63,7 @@ adminRouter.post("/signin", async function (req, res) {
       return res.status(400).json({ message: "Admin not found" });
     }
 
-    const isvalid = await bcrypt.compare(password, hashedpassword);
+    const isvalid = await bcrypt.compare(password, admin.password);
     if (!isvalid) {
       return res.status(401).json({ message: "wrong password" });
     }
@@ -72,7 +73,7 @@ adminRouter.post("/signin", async function (req, res) {
         id: admin._id,
         email: admin.email,
       },
-      jwt_secret,
+      admin_jwt_secret,
       {
         expiresIn: "1h",
       }
@@ -83,12 +84,55 @@ adminRouter.post("/signin", async function (req, res) {
   }
 });
 
-adminRouter.post("/course", adminmiddleware, function (req, res) {
+adminRouter.post("/course", adminmiddleware, async function (req, res) {
   const adminId = req.userId;
+
+  const { title, description, imageUrl, price } = req.body;
+
+  const course = await CourseModel.create({
+    title: title,
+    description: description,
+    imageUrl: imageUrl,
+    price: price,
+    creatorId: adminId,
+  });
+  res.json({
+    message: "course created",
+    courseId: course._id,
+  });
 });
 
-adminRouter.put("/course", function (req, res) {
-  res.json("you are signed in");
+adminRouter.put("/course/", async function (req, res) {
+  const { title, description, imageUrl, price } = req.body;
+  const { courseId } = req.params;
+
+  const adminId = req.adminId; // get from middleware later
+
+  await CourseModel.updateOne(
+    { _id: courseId },
+    {
+      title: title,
+      description: description,
+      imageUrl: imageUrl,
+      price: price,
+      creatorId: adminId,
+    }
+  );
+
+  return res.json({
+    message: "course updated",
+    courseId: courseId,
+  });
+});
+
+adminRouter.get("/course/bulk", async function (req, res) {
+  const adminId = req.userId;
+  const courses = await CourseModel.find({
+    creatorId: adminId,
+  });
+  res.json({
+    message: "courses ",
+  });
 });
 
 adminRouter.get("/course/bulk", function (req, res) {
