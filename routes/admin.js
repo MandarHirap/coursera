@@ -6,7 +6,6 @@ const jwt = require("jsonwebtoken");
 const { z, parse } = require("zod");
 const { admin_jwt_secret } = require("../config");
 const { adminmiddleware } = require("../middleware/admin");
-const admin = require("../middleware/admin");
 const salt_rounds = 10;
 
 const signupSchema = z.object({
@@ -133,10 +132,6 @@ adminRouter.get("/course/bulk", async function (req, res) {
   res.json({
     message: "courses ",
   });
-});
-
-adminRouter.get("/course/bulk", function (req, res) {
-  res.json("you are signed in");
 });
 
 module.exports = {
