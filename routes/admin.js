@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const { z, parse } = require("zod");
 const { admin_jwt_secret } = require("../config");
 const { adminmiddleware } = require("../middleware/admin");
+const course = require("./course");
 const salt_rounds = 10;
 
 const signupSchema = z.object({
@@ -101,7 +102,7 @@ adminRouter.post("/course", adminmiddleware, async function (req, res) {
   });
 });
 
-adminRouter.put("/course/", async function (req, res) {
+adminRouter.put("/course", async function (req, res) {
   const { title, description, imageUrl, price } = req.body;
   const { courseId } = req.params;
 
@@ -114,7 +115,6 @@ adminRouter.put("/course/", async function (req, res) {
       description: description,
       imageUrl: imageUrl,
       price: price,
-      creatorId: adminId,
     }
   );
 
@@ -124,13 +124,14 @@ adminRouter.put("/course/", async function (req, res) {
   });
 });
 
-adminRouter.get("/course/bulk", async function (req, res) {
+adminRouter.get("/course/bulk", adminmiddleware, async function (req, res) {
   const adminId = req.userId;
   const courses = await CourseModel.find({
     creatorId: adminId,
   });
   res.json({
-    message: "courses ",
+    message: "course updated",
+    courses,
   });
 });
 
