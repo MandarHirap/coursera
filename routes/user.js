@@ -1,6 +1,6 @@
 const { Router } = require("express");
 const userRouter = Router();
-const { adminModel, UserModel } = require("../db");
+const { adminModel, UserModel, purchasemodel } = require("../db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { z } = require("zod");
@@ -74,7 +74,7 @@ userRouter.post("/signin", async function (req, res) {
       return res.status(401).json({ message: "wrong password" });
     }
 
-    const token = jwt.sign({ id: user._id }, jwt_secret);
+    const token = jwt.sign({ id: user._id }, user_jwt_secret);
 
     return res.json({
       message: "signin success",
