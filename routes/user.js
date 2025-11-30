@@ -1,11 +1,12 @@
 const { Router } = require("express");
 const userRouter = Router();
-const { adminModel, UserModel, purchasemodel } = require("../db");
+const { adminModel, UserModel, purchasemodel, CourseModel } = require("../db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { z } = require("zod");
 
 const { user_jwt_secret } = require("../config");
+const { usermiddleware } = require("../middleware/user");
 const salt_rounds = 10;
 
 const signupSchema = z.object({
@@ -85,8 +86,24 @@ userRouter.post("/signin", async function (req, res) {
   }
 });
 
-userRouter.get("/purchase", function (req, res) {
-  res.json("courses that you have bought");
+userRouter.get("/purchase", usermiddleware, async function (req, res) {
+  const userId = req.userId;
+
+  // 1. Find all purchases by this user
+  const purchases = await purchasemodel.find({ userId });
+
+  // 2. Extract all courseIds the user bought
+  const courseIds = purchases.map((p) => p.courseId);
+
+  // 3. Fetch full course details
+  const courses = await CourseModel.find({
+    _id: { $in: courseIds },
+  });
+
+  res.json({
+    purchases,
+    courses,
+  });
 });
 
 module.exports = {
