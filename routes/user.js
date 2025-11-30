@@ -86,26 +86,22 @@ userRouter.post("/signin", async function (req, res) {
   }
 });
 
-userRouter.get("/purchase", usermiddleware, async function (req, res) {
+userRouter.get("/purchases", usermiddleware, async function (req, res) {
   const userId = req.userId;
 
-  // 1. Find all purchases by this user
   const purchases = await purchasemodel.find({ userId });
 
-  // 2. Extract all courseIds the user bought
-  const courseIds = purchases.map((p) => p.courseId);
+  const courseIds = purchases.map((x) => x.courseId);
 
-  // 3. Fetch full course details
-  const courses = await CourseModel.find({
+  const coursedata = await CourseModel.find({
     _id: { $in: courseIds },
   });
 
   res.json({
     purchases,
-    courses,
+    coursedata,
   });
 });
-
 module.exports = {
   userRouter,
 };
