@@ -1,41 +1,42 @@
 import { useState } from "react";
+import axios from "axios";
 
 export default function Signin() {
   const [form, setForm] = useState({ email: "", password: "" });
 
-  function handleChange(e) {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  }
-
-  async function handleSubmit() {
-    const res = await fetch("http://localhost:3000/api/v1/user/signin", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-    const data = await res.json();
-
-    if (data.token) {
-      localStorage.setItem("token", data.token);
-      alert("Signin success");
-    } else {
-      alert("Error");
+  async function handleSignin() {
+    try {
+      const res = await axios.post(
+        "http://localhost:3000/api/v1/user/signin",
+        form
+      );
+      localStorage.setItem("token", res.data.token);
+      alert("Signin success!");
+    } catch {
+      alert("Signin failed");
     }
   }
 
   return (
-    <div className="container">
-      <h1>Sign In</h1>
+    <div className="card max-w-md mx-auto mt-10">
+      <h2 className="text-2xl font-bold mb-4">Signin</h2>
 
-      <input name="email" placeholder="Email" onChange={handleChange} />
       <input
-        name="password"
-        placeholder="Password"
-        type="password"
-        onChange={handleChange}
+        placeholder="Email"
+        className="w-full mb-3"
+        onChange={(e) => setForm({ ...form, email: e.target.value })}
       />
 
-      <button onClick={handleSubmit}>Login</button>
+      <input
+        placeholder="Password"
+        type="password"
+        className="w-full mb-3"
+        onChange={(e) => setForm({ ...form, password: e.target.value })}
+      />
+
+      <button onClick={handleSignin} className="w-full">
+        Login
+      </button>
     </div>
   );
 }

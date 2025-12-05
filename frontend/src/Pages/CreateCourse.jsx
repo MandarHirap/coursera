@@ -1,45 +1,59 @@
 import { useState } from "react";
+import axios from "axios";
 
 export default function CreateCourse() {
   const [form, setForm] = useState({
     title: "",
     description: "",
-    price: "",
     imageUrl: "",
+    price: "",
   });
 
-  function handleChange(e) {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  }
+  async function create() {
+    try {
+      const token = localStorage.getItem("adminToken");
 
-  async function handleSubmit() {
-    const res = await fetch("http://localhost:3000/api/v1/admin/course", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        authorization: "Bearer " + localStorage.getItem("adminToken"),
-      },
-      body: JSON.stringify(form),
-    });
+      await axios.post("http://localhost:3000/api/v1/admin/course", form, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    const data = await res.json();
-    alert(data.message);
+      alert("Course created!");
+    } catch {
+      alert("Error creating course");
+    }
   }
 
   return (
-    <div className="container">
-      <h1>Create Course</h1>
+    <div className="card max-w-md mx-auto mt-10">
+      <h2 className="text-2xl font-bold mb-4">Create Course</h2>
 
-      <input name="title" placeholder="Course Title" onChange={handleChange} />
       <input
-        name="description"
-        placeholder="Description"
-        onChange={handleChange}
+        placeholder="Title"
+        className="w-full mb-3"
+        onChange={(e) => setForm({ ...form, title: e.target.value })}
       />
-      <input name="price" placeholder="Price" onChange={handleChange} />
-      <input name="imageUrl" placeholder="Image URL" onChange={handleChange} />
 
-      <button onClick={handleSubmit}>Create</button>
+      <input
+        placeholder="Description"
+        className="w-full mb-3"
+        onChange={(e) => setForm({ ...form, description: e.target.value })}
+      />
+
+      <input
+        placeholder="Image URL"
+        className="w-full mb-3"
+        onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
+      />
+
+      <input
+        placeholder="Price"
+        className="w-full mb-3"
+        onChange={(e) => setForm({ ...form, price: e.target.value })}
+      />
+
+      <button onClick={create} className="w-full">
+        Create
+      </button>
     </div>
   );
 }

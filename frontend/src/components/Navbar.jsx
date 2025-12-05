@@ -1,18 +1,17 @@
 import { Link } from "react-router-dom";
-import "./Navbar.css";
 
 export default function Navbar() {
   return (
-    <div className="nav">
-      <h2 className="logo">Coursera Clone</h2>
+    <nav className="bg-zinc-900 p-4 flex justify-between items-center shadow-lg">
+      <h1 className="text-xl font-bold">Course Store</h1>
 
-      <div className="links">
-        <Link to="/courses">Courses</Link>
-        <Link to="/purchases">My Purchases</Link>
-        <Link to="/create-course">Create Course</Link>
-        <Link to="/signin">Login</Link>
+      <div className="flex gap-6">
         <Link to="/signup">Signup</Link>
+        <Link to="/signin">Signin</Link>
+        <Link to="/courses">Courses</Link>
+        <Link to="/create-course">Create Course</Link>
+        <Link to="/purchases">Purchases</Link>
       </div>
-    </div>
+    </nav>
   );
 }

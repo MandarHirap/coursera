@@ -1,51 +1,20 @@
-:root {
-  --bg: #0a0a0a;
-  --card: #111;
-  --text: #fff;
-  --accent: #00c2ff;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
+/* GLOBAL DARK THEME */
 body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: "Inter", sans-serif;
+  @apply bg-black text-white;
 }
 
-a {
-  color: var(--accent);
-  text-decoration: none;
-}
-
-.input {
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  background: #222;
-  border: 1px solid #333;
-  border-radius: 6px;
-  color: white;
+input {
+  @apply bg-zinc-900 border border-zinc-700 p-2 rounded text-white;
 }
 
 button {
-  padding: 12px 20px;
-  background: var(--accent);
-  border: none;
-  color: black;
-  border-radius: 6px;
-  font-size: 16px;
-  cursor: pointer;
-  font-weight: bold;
-  margin-top: 10px;
-}
-
-button:hover {
-  opacity: 0.8;
+  @apply bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded;
 }
 
 .card {
-  background: var(--card);
-  padding: 20px;
-  border-radius: 10px;
-  margin: 15px 0;
+  @apply bg-zinc-800 p-6 rounded-lg shadow-lg;
 }
