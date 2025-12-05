@@ -1,10 +1,8 @@
-function Purchases() {
+export default function Purchases() {
   return (
-    <div>
+    <div className="card">
       <h2>Your Purchases</h2>
-      <p>This page will show the courses you purchased.</p>
+      <p>Purchased courses will appear here.</p>
     </div>
   );
 }
-
-export default Purchases;
